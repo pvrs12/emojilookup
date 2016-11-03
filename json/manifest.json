@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2,
+	"name": "Emoji Lookup",
+	"version": "0.1",
+	
+	"description": "Shows the name of an Emoji when highlighted",
+
+	"icons": {
+		"48": "icons/icon-48.png"
+	},
+
+	"content_scripts":[
+		{
+			"matches":["<all_urls>"],
+			"js":["js/emojilookup.js"]
+		}
+	],
+	"permissions": {
+		"systemXHR": {}
+	},
+	"applications": {
+		"gecko": {
+			"id": "pvrs12_emojilookup@github.com"
+		}
+	}
+}
