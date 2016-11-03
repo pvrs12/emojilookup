@@ -33,7 +33,7 @@ function get_name(code){
 		if(request.readyState === 4){
 			if(request.status === 200){
 				var res = JSON.parse(request.responseText);
-				emoji_popup_list.push([String.fromCodePoint(code), escape_string(res['name'])]);
+				emoji_popup_list.push([String.fromCodePoint(code), escape_string(res['name']), escape_string(res['url'])]);
 				update_popup();
 			} else {
 				console.log('Error! Status: '+reqeust.status);
@@ -42,31 +42,53 @@ function get_name(code){
 	}
 }
 
-function hide_popup(){
-	console.log('removing popup');
-	var element = document.getElementById('emojiDiv');
+function remove_element_by_id(id){
+	var element = document.getElementById(id);
 	if(element){
 		element.parentElement.removeChild(element);
 	}
 }
 
+function hide_popup(){
+	console.log('removing popup');
+	remove_element_by_id('emojiDiv');
+}
+
 function create_popup(){
 	console.log('adding popup');
 	var popup = document.createElement("div");
-	popup.setAttribute("style", "left: " + cursorX + "px;"+
+	popup.setAttribute("style", 
+											"left: " +cursorX+"px;"+
 											"top: "+cursorY+"px;"+
 											"position: absolute;"+
-											"max-height: 100px;"+
+											"max-height: 300px;"+
+
 											"overflow-y: auto;"+
+											"overflow-x: hidden;"+
+
 											"z-index: 1;"+
+
 											"background-color: #cfebfc;"+
 											"color: #4c5143;"+
+
 											"border-style: solid;"+
 											"border-color: #4c5143;"+
 											"border-width: 2px;"+
 											"border-radius: 5px;"+
+
 											"font-size: 12px;");
 	popup.setAttribute("id", "emojiDiv");
+	var container = document.createElement("div");
+	container.setAttribute("style",
+											"text-align:right;"+
+											"padding-right: 5px;");
+	var button = document.createElement("font");
+	button.setAttribute("color","red");
+	button.setAttribute("style","cursor: pointer;font-size:18px;");
+	button.onclick = hide_popup;
+	button.innerHTML="☒";
+	container.appendChild(button);
+	popup.appendChild(container);
 
 	document.body.appendChild(popup);
 }
@@ -76,9 +98,7 @@ function update_popup(){
 		create_popup();
 	}
 	var popup = document.getElementById("emojiDiv");
-	while(popup.firstChild) {
-		popup.removeChild(popup.firstChild);
-	}
+	remove_element_by_id('emojiTable');
 	var table = document.createElement("table");
 	emoji_popup_list.sort(function(a, b){
 		return a[1] > b[1];
@@ -90,17 +110,22 @@ function update_popup(){
 		var tr = document.createElement("tr");
 		var td1 = document.createElement("td");
 		var td2 = document.createElement("td");
-		td1.setAttribute("style","padding-right:10px;"+
-											"padding-left:5px;"
-										);
+		var a = document.createElement("a");
+		td1.setAttribute("style",
+											"padding-right:10px;"+
+											"padding-left:5px;");
 		td1.innerHTML = filtered[i][0];
-		td2.setAttribute("style","padding-right:5px;");
-		td2.innerHTML = filtered[i][1];
+		td2.setAttribute("style",
+											"padding-right:5px;");
+		a.setAttribute("href", filtered[i][2]);
+		a.innerHTML = filtered[i][1];
+		td2.appendChild(a);
 
 		tr.appendChild(td1);
 		tr.appendChild(td2);
 		table.appendChild(tr);
 	}
+	table.setAttribute('id', 'emojiTable');
 	popup.appendChild(table);
 }
 
@@ -115,10 +140,9 @@ window.onmousemove = function(e){
 	cursorY = e.pageY;
 }
 
-window.addEventListener('mouseup', function(){
+function checkSelection(){
 	text = window.getSelection().toString();
 	
-	hide_popup();
 	if(text !== ''){
 		emoji_popup_list = [];
 		for(i=0; i<text.length; ++i){
@@ -131,5 +155,9 @@ window.addEventListener('mouseup', function(){
 			}, codepoint);
 		}
 	}
+}
+
+window.addEventListener('mouseup', function(){
+	setTimeout(checkSelection, 250);
 });
 
