@@ -15,9 +15,9 @@
 			"js":["js/emojilookup.js"]
 		}
 	],
-	"permissions": {
-		"systemXHR": {}
-	},
+	"permissions": [
+		"https://www.fileformat.info/"
+	],
 	"applications": {
 		"gecko": {
 			"id": "pvrs12_emojilookup@github.com"
